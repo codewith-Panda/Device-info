@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Device Info Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    h2 {
+      color: #333;
+    }
+    p {
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Your Device Information</h2>
+  <div id="info"></div>
+
+  <script>
+    async function getDeviceInfo() {
+      let infoHTML = "";
+
+      // User agent (browser + device info)
+      infoHTML += `<p><strong>Browser Info:</strong> ${navigator.userAgent}</p>`;
+
+      // Screen size
+      infoHTML += `<p><strong>Screen Size:</strong> ${screen.width} x ${screen.height}</p>`;
+
+      // Platform
+      infoHTML += `<p><strong>Platform:</strong> ${navigator.platform}</p>`;
+
+      // Network info
+      if ('connection' in navigator) {
+        const conn = navigator.connection;
+        infoHTML += `<p><strong>Network Type:</strong> ${conn.effectiveType}</p>`;
+      } else {
+        infoHTML += `<p><strong>Network Type:</strong> Not supported</p>`;
+      }
+
+      // Battery status
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
+          const level = Math.round(battery.level * 100);
+          infoHTML += `<p><strong>Battery Level:</strong> ${level}%</p>`;
+        } catch (err) {
+          infoHTML += `<p><strong>Battery Info:</strong> Error fetching</p>`;
+        }
+      } else {
+        infoHTML += `<p><strong>Battery Info:</strong> Not supported</p>`;
+      }
+
+      // Geolocation
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const { latitude, longitude } = position.coords;
+            infoHTML += `<p><strong>Location (approx):</strong> ${latitude.toFixed(4)}, ${longitude.toFixed(4)}</p>`;
+            document.getElementById("info").innerHTML = infoHTML;
+          },
+          error => {
+            infoHTML += `<p><strong>Location:</strong> Permission denied or unavailable</p>`;
+            document.getElementById("info").innerHTML = infoHTML;
+          }
+        );
+      } else {
+        infoHTML += `<p><strong>Location:</strong> Not supported</p>`;
+        document.getElementById("info").innerHTML = infoHTML;
+      }
+    }
+
+    getDeviceInfo();
+  </script>
+</body>
+</html>
